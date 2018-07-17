@@ -1,4 +1,4 @@
-import sun.jvm.hotspot.runtime.amd64.AMD64CurrentFrameGuess
+//import sun.jvm.hotspot.runtime.amd64.AMD64CurrentFrameGuess
 
 //Conditionals
 def abs(x: Int) = if (x >= 0) x else -x

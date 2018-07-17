@@ -71,3 +71,9 @@ def mapReduce(f: Int => Int, combine: (Int, Int) => Int, zero: Int)(a: Int, b: I
   if (a > b) zero
   else combine(f(a), mapReduce(f, combine, zero)(a + 1, b))
 }
+
+//Syntax
+//Extended Backus-Naur form (EBNF)
+// | denotes an alternative
+// [...] an option (0 or 1)
+// {...} a repetition (0 or more)
