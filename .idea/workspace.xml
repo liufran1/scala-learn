@@ -2,7 +2,14 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="a0ebda97-0e76-4a8c-a94d-85345080d446" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/recfun/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/recfun/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/recfun/src/main/scala/recfun/Main.scala" beforeDir="false" afterPath="$PROJECT_DIR$/recfun/src/main/scala/recfun/Main.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/recfun/src/test/scala/recfun/CountChangeSuite.scala" beforeDir="false" afterPath="$PROJECT_DIR$/recfun/src/test/scala/recfun/CountChangeSuite.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/recfun/target/scala-2.11/classes/recfun/Main$.class" beforeDir="false" afterPath="$PROJECT_DIR$/recfun/target/scala-2.11/classes/recfun/Main$.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/recfun/target/scala-2.11/test-classes/recfun/CountChangeSuite$$anonfun$2.class" beforeDir="false" afterPath="$PROJECT_DIR$/recfun/target/scala-2.11/test-classes/recfun/CountChangeSuite$$anonfun$2.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/recfun/target/scala-2.11/test-classes/recfun/CountChangeSuite$$anonfun$3.class" beforeDir="false" afterPath="$PROJECT_DIR$/recfun/target/scala-2.11/test-classes/recfun/CountChangeSuite$$anonfun$3.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/recfun/target/scala-2.11/test-classes/recfun/CountChangeSuite$$anonfun$4.class" beforeDir="false" afterPath="$PROJECT_DIR$/recfun/target/scala-2.11/test-classes/recfun/CountChangeSuite$$anonfun$4.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/recfun/target/scala-2.11/test-classes/recfun/CountChangeSuite.class" beforeDir="false" afterPath="$PROJECT_DIR$/recfun/target/scala-2.11/test-classes/recfun/CountChangeSuite.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/week1-scratch.sc" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/week1-scratch.sc" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/week2-scratch.sc" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/week2-scratch.sc" afterDir="false" />
     </list>
@@ -27,8 +34,8 @@
       <file leaf-file-name="week1-scratch.sc" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/scala/week1-scratch.sc">
           <provider selected="true" editor-type-id="text-editor">
-            <state>
-              <caret column="2" selection-start-column="2" selection-end-column="2" />
+            <state relative-caret-position="150">
+              <caret line="10" column="54" selection-start-line="10" selection-start-column="54" selection-end-line="10" selection-end-column="54" />
             </state>
           </provider>
         </entry>
@@ -36,8 +43,8 @@
       <file leaf-file-name="week2-scratch.sc" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/scala/week2-scratch.sc">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="557">
-              <caret line="71" column="59" lean-forward="true" selection-start-line="71" selection-start-column="59" selection-end-line="71" selection-end-column="59" />
+            <state relative-caret-position="632">
+              <caret line="176" column="42" lean-forward="true" selection-start-line="176" selection-start-column="42" selection-end-line="176" selection-end-column="42" />
             </state>
           </provider>
         </entry>
@@ -83,7 +90,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="AndroidView" />
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -113,8 +120,8 @@
           <select />
         </subPane>
       </pane>
+      <pane id="AndroidView" />
       <pane id="PackagesPane" />
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -235,46 +242,47 @@
       <workItem from="1531785578457" duration="28000" />
       <workItem from="1531789517433" duration="29000" />
       <workItem from="1531791175187" duration="4095000" />
+      <workItem from="1531878281493" duration="3437000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="7693000" />
+    <option name="totallyTimeSpent" value="11130000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="1930" y="44" width="1663" height="907" extended-state="0" />
-    <editor active="true" />
     <layout>
       <window_info anchor="right" id="Palette" order="3" />
-      <window_info anchor="bottom" id="TODO" order="6" />
-      <window_info anchor="bottom" id="Messages" order="7" weight="0.32879376" />
       <window_info anchor="right" id="sbt" order="3" />
-      <window_info anchor="right" id="Palette&#9;" order="3" />
-      <window_info id="Image Layers" order="2" />
-      <window_info anchor="right" id="Capture Analysis" order="3" />
       <window_info anchor="bottom" id="Event Log" order="7" side_tool="true" />
       <window_info anchor="right" id="Maven Projects" order="3" />
       <window_info anchor="bottom" id="Database Changes" order="7" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Run" order="2" />
-      <window_info anchor="bottom" id="Version Control" order="7" />
-      <window_info anchor="bottom" id="Terminal" order="7" />
       <window_info id="Capture Tool" order="2" />
       <window_info id="Designer" order="2" />
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.21046302" />
-      <window_info anchor="bottom" id="sbt-shell-toolwindow" order="7" />
       <window_info anchor="right" id="Database" order="3" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info id="UI Designer" order="2" />
-      <window_info anchor="right" id="Theme Preview" order="3" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
+      <window_info anchor="bottom" id="TODO" order="6" />
+      <window_info anchor="bottom" id="Messages" order="7" weight="0.3277311" />
+      <window_info anchor="right" id="Palette&#9;" order="3" />
+      <window_info id="Image Layers" order="2" />
+      <window_info anchor="right" id="Capture Analysis" order="3" />
+      <window_info anchor="bottom" id="Run" order="2" />
+      <window_info anchor="bottom" id="Version Control" order="7" />
+      <window_info anchor="bottom" id="Terminal" order="7" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.21046302" />
+      <window_info anchor="bottom" id="sbt-shell-toolwindow" order="7" />
+      <window_info anchor="right" id="SciView" />
+      <window_info anchor="right" id="Theme Preview" order="3" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
-      <window_info anchor="bottom" id="Message" order="0" />
+      <window_info anchor="bottom" id="Find" order="1" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Build" order="7" visible="true" weight="0.32893157" />
-      <window_info anchor="bottom" id="Find" order="1" />
+      <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
     </layout>
   </component>
@@ -285,6 +293,20 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/src/main/scala/week1-scratch.sc">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="2" selection-start-column="2" selection-end-column="2" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/scala/week2-scratch.sc">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1065">
+          <caret line="71" column="59" lean-forward="true" selection-start-line="71" selection-start-column="59" selection-end-line="71" selection-end-column="59" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/scala/week1-scratch.sc">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="960">
@@ -313,17 +335,28 @@
         </state>
       </provider>
     </entry>
+    <entry file="jar:///Library/Java/JavaVirtualMachines/jdk1.8.0_162.jdk/Contents/Home/src.zip!/java/lang/Object.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="268">
+          <caret line="234" column="18" selection-start-line="234" selection-start-column="18" selection-end-line="234" selection-end-column="18" />
+          <folding>
+            <element signature="e#10065#10066#0" expanded="true" />
+            <element signature="e#10148#10149#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/scala/week1-scratch.sc">
       <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret column="2" selection-start-column="2" selection-end-column="2" />
+        <state relative-caret-position="150">
+          <caret line="10" column="54" selection-start-line="10" selection-start-column="54" selection-end-line="10" selection-end-column="54" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/scala/week2-scratch.sc">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="557">
-          <caret line="71" column="59" lean-forward="true" selection-start-line="71" selection-start-column="59" selection-end-line="71" selection-end-column="59" />
+        <state relative-caret-position="632">
+          <caret line="176" column="42" lean-forward="true" selection-start-line="176" selection-start-column="42" selection-end-line="176" selection-end-column="42" />
         </state>
       </provider>
     </entry>

@@ -1,4 +1,15 @@
 //import sun.jvm.hotspot.runtime.amd64.AMD64CurrentFrameGuess
+//Call by name vs call by value
+def constOne(x: Int, y: => Int) = 1
+
+//Scala by default does call by value.
+// => forces call by name
+
+// constOne(3 * 4, loop)
+// this evaluates 3 * 4 first, and then constOne(12, loop) since x is call by value
+// if y were evaluated by call by value, this would not terminate since loop would keep trying to evaluate
+// because y is forced to call by name, this returns 1
+
 
 //Conditionals
 def abs(x: Int) = if (x >= 0) x else -x
