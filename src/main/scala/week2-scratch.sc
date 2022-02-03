@@ -19,14 +19,19 @@ def sumCube2(a: Int, b: Int): Int = sum(cube, a, b)
 //f: Int => Int defines the function type
 
 //Anonymous functions
-//like literals for functions
+//like literals for functions - 
+//   don't have to write "def func ..." every time you write a new function you call once
 //Syntactic sugar
 // the anonymous function
 // (x: Int) => x * x * x
 // can be passed
 
 def sumCube3(a: Int, b: Int) = sum(x => x * x * x, a, b)
+// Don't need types on the 'x' because we already know it from the def of 'sum'
 
+
+// Turning the above linear recursion version of sum into a tail-recursive version
+// use accumulator acc
 def sum1(f: Int => Int)(a: Int, b: Int): Int = {
   def loop(a: Int, acc: Int): Int = {
     if (a > b) acc
