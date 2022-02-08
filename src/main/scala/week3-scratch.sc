@@ -150,4 +150,78 @@ def nth[T](n: Int, list: List[T]): T = {
 
 
 // Scala is a pure object-oriented language
+
+// Every value is an object
+// Can build up, for example Booleans, from first principals
+
+abstract class Boolean extends AnyVal:
+  def ifThenElse[T](t: =>, e: => T): T
+  def && (x: => Boolean): Boolean = ifThenElse(x, false)
+  def || (x: => Boolean): Boolean = ifThenElse(true, x)
+  def unary_!: Boolean = ifThenElse(false, true)
+
+  def == (x: Boolean): Boolean = ifThenElse(x, x.unary_!)
+  def == (x: Boolean): Boolean = ifThenElse(x.unary_!, x)
+end Boolean
+
+// Can define true and false in terms of this abstract class
+object true extends Boolean:
+  def ifThenElse[T](t: =>, e: => T): t 
+
+object false extends Boolean:
+  def ifThenElse[T](t: =>, e: => T): e
+
+// Implementation of the "implies" operator
+extension (x: Boolean):
+  def ==> (y: Boolean) = x.ifThenElse(y,true)
+
+// Can do the same for natural numbers
+// Basically use the Peano framework
+abstract class Nat:
+  def isZero: Boolean
+  def predecessor: Nat
+  def successor: Nat
+  def + (that: Nat): Nat
+  def - (that: Nat): Nat
+end Nat
+
+
+object Zero extends Nat:
+  def isZero: true
+  def predecessor: Nat
+  def successor: Succ(this)
+  def + (that: Nat): that
+  def - (that: Nat): if that.isZero then this else ???
+  override def toString = "Zero"
+end Zero
+
+class Succ(n: Nat) extends Nat:
+  def isZero: false
+  def predecessor: n
+  def successor: Succ(this)
+  def + (that: Nat): Succ(n + that)
+  def - (that: Nat): if that.isZero then this else n - that.predecessor
+  override def toString = s"Succ($n)"
+end Succ
+
+
 // Every function can be represented as an object
+// Function values are treated as objects in scala
+// function type A => B is an abbreviation for the class scala.Function1[A, B]
+// Functions are objects with apply methods
+trait Function1[A, B]:
+  def apply(x: A): B
+
+// Function calls
+// f(a, b) can be expanded to
+f.apply(a, b)
+
+// Can translate to Object Oriented
+// Functional
+val f = (x: Int) => x * x
+f(7)
+
+// Object Oriented
+val f = new Function1[Int, Int]:
+  def apply(x: Int) = x * x
+f.apply(7)
