@@ -115,3 +115,109 @@ def queens(n: Int) = {
     }
     placeQueens(n)
 }
+
+// Maps - iterables. Extend iterables of (key, value) pairs
+// Map[Key, Value]
+
+val romanNumerals = Map("I" -> 1, "V" -> 5, "X" -> 10)
+
+// Maps are also functions. Map[Key, Value] extends the function type Key => Value
+romanNumerals("V") // returns 5, throws an exception if the Key isn't already in the Map
+romanNumerals.get("V") // Returns None if the Key isn't in the map
+// Result of get is an Option
+
+trait Option[+A]
+
+case class Some[+A](value: A) extends Option[A]
+object None extends Option[Nothing]
+// map.get(key) returns
+// * None if map does not contain the given key
+// * Some(x) if map associates the given key with the value x
+// Does not return Null - if any value can be Null, you never know beforehand whether a certain element is defined or not
+// => Null was a mistake
+
+// Can convert back to value's type using pattern matching
+def showInt(numeral: String): Int = romanNumerals.get(numeral) match {
+    case Some(ints) => ints
+    case None => 0
+}
+
+// alternatively, can add default value
+val romanNumerals1 = romanNumerals.withDefaultValue(0)
+
+// Updating maps
+// m + (k -> v) // The map that takes key k to value v and is otherwise equal to m
+// m ++ kvs // The map m updated via + with all the key/value pairs in kvs
+val m1 = Map("red" -> 1, "blue" -> 2)
+val m2 = m1 + ("blue" -> 3)
+m2 == Map("red" -> 1, "blue" -> 3)
+m1
+
+// sortWith - equivalent to orderBy in SQL
+val fruit = List("apple", "pear", "orange", "pineapple")
+fruit.sortWith(_.length < _.length) // Sort the list by the length of the strings ascending
+fruit.sorted // uses the default sorting for the type
+
+fruit.groupBy(_.head) == Map("p" -> List("pear", "pineapple"), "a" -> List("apple"), "o" -> List("orange"))
+// _.head is the discriminator function
+
+class Polynom(nonZeroTerms: Map[Int,Double]):{
+    def this(bindings: (Int, Double)*) = this(bindings.toMap) // repeated parameters - vararg. the * represents a list
+
+    val terms = nonZeroTerms.withDefaultValue(0.0)
+
+    def + (other: Polynom): Polynom = {
+        Polynom(other.terms.foldLeft(terms)(addTerm))
+        // Polynom(terms ++ other.terms.map((exp, coeff) => (exp, terms(exp)+coeff))) 
+        // for the given exponent, get the coefficient and add to the other coefficient. If exp doesn't exist in the other Polynom, do nothing
+    }
+    def addTerm(terms: Map[Int, Double], term: (Int, Double)): Map[Int, Double] = {
+        val (exp, coeff) = term
+        terms + (exp -> (terms(exp) + coeff))
+    } // Helper for foldLeft version of + . More efficient since you don't need to build up the map
+
+    override def toString = {
+        val termStrings = {
+            for (exp, coeff) <- terms.toList.sorted.reverse
+            yield
+                val exponent = if exp == 0 then "" else s"x^$exp"
+                s"$coeff$exponent"
+        if terms.isEmpty then "0"
+        else termStrings.mkString(" + ")
+        }
+    }
+}
+
+val x = Polynom(0 -> 2, 1->-3, 2->1)
+
+// Example - encoding mnemonics
+
+class Coder(words: List[String]): {
+    val mnemonics = Map(
+        '2' -> "ABC", '3' -> "DEF", '4' -> "GHI", '5' -> "JKL",
+        '6' -> "MNO", '7' -> "PQRS", '8' -> "TUV", '9' -> "WXYZ"
+    )
+    /** Maps a letter to the digit it represents, inverts the map */
+    private val charCode: Map[Char, Char] = {
+        for
+            (digit, str) <- mnemonics
+            ltr <- str
+        yield ltr -> digit // a specific binding in a map
+    }
+
+    private def wordCode(word: String): String = word.toUpperCase.map(charCode)
+
+    private def wordsForNum: Map[String, List[String]] = words.groupBy(wordCode).withDefaultValue(Nil)
+
+    def encode(number: String): Set[List[String]] = {
+        if number.isEmpty then Set(Nil)
+        else {
+            for
+                splitPoint <- (1 to number.length).toSet // Picking where to put a space to separate strings into words
+                word <- wordsForNum(number.take(splitPoint)) // take all numbers up to the split point, call wordsForNum
+                rest <- encode(number.drop(splitPoint)) // Recursively call for the remainder
+            yield word :: rest
+        }
+    } 
+
+}
