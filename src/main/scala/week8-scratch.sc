@@ -103,3 +103,109 @@ enum State[T]:
     case Cons(hd: T, tl: LazyList[T])
 
 
+// Infinite lists
+// Since lazy lists are computed only as needed, can definite infinite lists
+def from(n: Int): LazyList[Int] = n #:: from(n + 1)
+
+val nats = from(0) // All natural numbers
+nats.map(_ * 4) // All multiples of 4
+
+nats.take(10) // Not computed at this time, still a lazy object
+nats.take(10).toList // Computed at this time
+
+// Sieve of Eratosthenes implementation
+def sieve(s: LazyList[Int]): LazyList[Int] = 
+    s.head #:: sieve(s.tail.filter(_ % s.head != 0))
+
+val primes = sieve(from(2))
+
+primes.take(10).toList // first 10 primes
+// Don't need to define upper bound for calculation - don't need to know first 10 primes are below some integer to bound the calculation
+
+def sqrtSeq(x: Double): LazyList[Double] = // Gives a sequence of guesses of the sqrt value
+    def improve(guess: Double) = (guess + x / guess) / 2
+    lazy val guesses: LazyList[Double] = 1 #:: guesses.map(improve)
+    guesses
+
+// Can then filter for the values within the accuracy bound afterwards
+
+// Two ways to get multiples of N
+val xs = from(1).map(_ * N) 
+val ys = from(1).filter(_ % N == 0) // Slower because from computes all values first, before filter subsets
+
+
+// The water pouring problem
+
+//    Two glasses of given size, can fill them completely, empty completely, or pour from one to another
+//    Attempt to produce a target volume
+
+//    Can use lazy structures to perform breadth first search
+
+//  Representations
+//      Glass: Int
+//      State: Vector[Int] - Vector(2, 3) represents the first glass has 2 units of water, second glass has 3 units water
+//  Moves
+//      Empty(glass)
+//      Fill(glass)
+//      Pour(from, to)
+
+
+type Glass = Int
+type State = Vector[Int]
+
+class Pouring(full: State):
+    
+    enum Move:
+        case Empty(glass: Glass)
+        case Fill(glass: Glass)
+        case Pour(from: Glass, to: Glass)
+
+        def apply(state: State): State = this match {
+            case Empty(glass) => state.updated(glass, 0)
+            case Fill(glass) => state.updated(glass, full(glass))
+            case Pour(from: Glass, to: Glass) => {
+                val amount = state(from) min (full(to) - state(to)) // Amount to pour from one to the other
+                state.updated(from, state(from) - amount).updated(to, state(to) + amount)
+            }
+        }
+    end Move
+
+    val moves = {
+        val glasses: Range = 0 until full.length
+        (for g <- glasses yield Move.Empty(g)) // Empty a glass
+        ++ (for g <- glasses yield Move.Fill(g)) // Fill a glass
+        ++ (for g1 <- glasses; g2 glasses if g1 != g2 yield Move.Pour(g1, g2))
+    }
+
+    class Path(history: List[Move], val endState: State):
+        def extend(move: Move) = Path(move :: history, move(endState))
+        override def toString = s"${history.reverse.mkString(" ")} --> $endState"
+    end Path
+
+    val empty: State = full.map(x => 0)
+    val start = Path(Nil, empty)
+
+    def pathsFrom(paths: List[Path], explored: Set[State]): LazyList[List[Path]] = { // Builds infinite list of possible paths
+        val frontier = 
+            for
+                path <- paths
+                move <- moves
+                next = path.extend(move)
+                if !explored.contains(next.endState)
+            yield next
+        paths #:: pathsFrom(frontier, explored ++ frontier.map(_.endState)) // add all endStates for these paths to the explored set
+    } 
+
+    def solutions(target: Int): LazyList[Path] = { // Filter all possible paths to solutions
+        for
+            paths <- pathsFrom(List(start), Set(empty)) // Start from the start, and initially the search space is empty
+            path <- paths
+            if path.endState.contains(target)
+        yield path
+    }
+end Pouring
+
+val problem = Pouring(Vector(4, 7)) // glasses of size 4, 7
+
+problem.solutions(6) // Target value of 6, still lazy
+problem.solutions(6).head // Shortest path - now the value is computed
