@@ -146,3 +146,90 @@ def f() =
     def g(using c: C) = ()
 
 g // summons b
+
+
+// Type classes
+
+trait Ordering[A]:
+    def compare(x: A, y: A): Int
+
+object Ordering:
+    given Ordering[Int] with
+        def compare(x: Int, y: Int): Int = if x < y then -1 else if x > y then 1 else 0
+
+    given Ordering[String] with
+        def compare(s: String, t: String) = s.compareTo(t)
+
+// Ordering is a "type class"
+//    A generic trait with given instances for type instances of that trait
+//    At compilation time, the compiler resolves the specific Ordering implementation that matches the type being used
+
+//    This supports retroactive extension - can add the "compare" capability to Int and String without changing the data types themselves
+
+// Can also implement conditional instances
+
+given listOrdering[A](using ord: Ordering[A]) as Ordering[List[A]] with // Takes type parameter A and implicit parameter ord
+    def compare(xs: List[A]) = (xs, ys) match {
+        case (Nil, Nil) => 0
+        case (Nil, _) => -1
+        case (_, Nil) => 1
+        case (x :: xs1, y :: ys1) => 
+            val c = ord.compare(x, y)
+            if c != 0 then c else compare(xs1, ys1)
+    }
+// a listOrdering for a type T only exists if an Ordering exists for T
+// should be implemented within a type class
+
+// Given instances with implicit parameters are resolved recursively
+
+def sort[A](xs: List[A])(using Ordering[A]): List[A] = ???
+val xss: List[List[Int]] = ???
+
+sort(xss) == sort[List[Int]](xss)
+          == sort[List[Int]](xss)(using listOrdering)
+          == sort[List[Int]](xss)(using listOrdering(using Ordering.Int))
+
+// Example: sorting addresses
+//    Sort first by zipcode, and then by streetname
+type Address = (Int, String) // Zipcode, Street Name
+val xs: List[Address] = ???
+
+// implement ordering
+given pairOrdering[A, B](using orda: Ordering[A], ordb: Ordering[B]): Ordering[(A, B)] with
+    def compare(x: (A, B), y: (A, B)) = 
+        val c = orda.compare(x._1, y._1)
+        if c != 0 then c else ordb.compare(x._2, y._2)
+
+
+// Type class traits may define extension methods, and these extension methods are made available when summoned
+
+trait Ordering[A]:
+    def compare(x: A, y: A): Int
+
+    extension (x: A)
+        def < (y: A): Boolean = compare(x, y) < 0
+        def <= (y: A): Boolean = compare(x, y) <= 0
+        def > (y: A): Boolean = compare(x, y) > 0
+        def >= (y: A): Boolean = compare(x, y) >= 0
+
+// Can use type classes to implement abstract algebra concepts
+trait SemiGroup[T]:
+    extension (x: T) def combine (y: T): T // The binary operator is associative. 
+    // If a Semigroup has an identity, it is a monoid
+    // A monoid with invertibility is a group
+
+def reduce[T: SemiGroup](xs: List[T]): T = xs.reduceLeft(_.combine(_))
+
+// extending to Monoid
+trait Monoid[T] extends SemiGroup[T]:
+    def unit: T
+
+def reduce[T](xs: List[T])(using m: Monoid[T]): T = xs.foldLeft(m.unit)(_.combine(_))
+// rewrite using context bounds, use summon to avoid having to call m directly
+def reduce[T: Monoid](xs: List[T]): T = xs.foldLeft(summon[Monoid[T]].unit)(_.combine(_))
+
+// Can streamline this further by defining a global function Monoid.apply[T] that returns the Monoid[T] instance that is currently visible
+object Monoid:
+    def apply[T](using m: Monoid[T]): Monoid[T] = m
+
+def reduce[T: Monoid](xs: List[T]): T = xs.foldLeft([Monoid[T]].unit)(_.combine(_))
