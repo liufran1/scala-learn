@@ -212,7 +212,7 @@ trait Ordering[A]:
         def > (y: A): Boolean = compare(x, y) > 0
         def >= (y: A): Boolean = compare(x, y) >= 0
 
-// Can use type classes to implement abstract algebra concepts
+// Example: Can use type classes to implement abstract algebra concepts
 trait SemiGroup[T]:
     extension (x: T) def combine (y: T): T // The binary operator is associative. 
     // If a Semigroup has an identity, it is a monoid
@@ -233,3 +233,67 @@ object Monoid:
     def apply[T](using m: Monoid[T]): Monoid[T] = m
 
 def reduce[T: Monoid](xs: List[T]): T = xs.foldLeft([Monoid[T]].unit)(_.combine(_))
+
+
+// Context Passing
+//   Parallel computation uses thread schedulers. There is a default scheduler, but it should be possible to override it in parts of the code
+//   references to schedulers are propagated as embedded in values of types ExecutionContext
+given global: ExecutionContext = ForkJoinContext() // Default - the execution context "global" is defined as an alias of the existing ForkJoinContext
+// this evaluation is done lazily - the ForkJoinContext is created the first time global is used
+
+// Execution contexts rarely change, but should be changeable everywhere if they do change
+//   => pass it as an implicit parameter
+def processItems()(using ExecutionContext) = ???
+
+// Other similar things we want to pass implicitly:
+//      * a configuration
+//      * the available set of capabilities
+//      * the security level in effect
+//      * the layout scheme to render some data
+//      * the persons that have access to some data
+
+
+// opaque types - restrict scope of a type
+object ConfManagement:
+    opaque type Viewers = Set[Person] // this equality is known only within the scope where this alias is defined, the ConfManagement object
+// outside of this scope, Viewers is only known as an abstract type, without its relationship to Set[Person]
+// Can be used to prevent tampering / injection attacks
+//   Can't create a Viewers instance outside the ConfManagement object
+
+// by combining this with implicit "using" clauses, we have functions take this as an opaque default parameter
+//   since the scope of Viewers is restricted, this reduces the chance to accidentally pass these as given instances of other types
+
+enum Expr:
+    case Number(num: Int)
+    case Sum(x: Expr, y: Expr)
+    case Prod(x: Expr, y: Expr)
+    case Var(name: String)
+    case Let(name: String, rhs: Expr, body: Expr)
+import Expr._
+
+def eval(e: Expr): Int = // Writing an evaluation function for Expr. For Var, need to get the value that Var is storing
+    def recur(e: Expr)(using env: Map[String, Int]): Int = e match {
+        case Number(n) => n
+        case Sum(x, y) => recur(x) + recur(y)
+        case Prod(x, y) => recur(x) * recur(y)
+        case Var(name) => env(name)
+        case Let(name, rhs, body) => recur(body)(using env + (name -> recur(rhs))) // pass an updated version of the map with 
+    } 
+    // Use a map from variable names to their defined values as an implicit parameter
+    // The map is initially empty, and augmented in every Let node
+
+
+// Implicit function types
+def rankings = (viewers: Viewers) ?=> papers.sortBy(score(_, viewers)).reverse
+// ?=> indicates the parameter "viewers" is now implicit, so its arguments can be inferred
+// the type of this anonymous function with a using clause is now
+// Viewers ?=> List[Paper] // an implicit function type
+
+val f: A ?=> B
+given a: A
+f == f(using a) // compiler infers "a" as the correct parameter for the implicit parameter
+// Implicit functions get created on-demand
+// if the expected type of an expression b is A ?=> B, then 
+// b expands to the anonymous function (_: A) ?=> b before b is type checked
+//   Therefore, can set up the implicit function type f: A ?=> B in place of having to write the "using a" clauses
+// An abstraction of context abstractions
