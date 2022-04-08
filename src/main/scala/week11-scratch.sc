@@ -136,3 +136,76 @@ c() == 30
 
 a.withdraw(8)
 c() == 22
+
+
+// Implementing Signal and Var
+
+// Each signal maintains
+//   * its current value
+//   * the current expression that defines the signal value
+//   * a set of observers - the other signals that depend on its value. they need to be reevaluated when the signal changes
+//   Recording dependencies
+//      * when evaluating a signal-valued expression, need to know which other signal gets defined or updated (the caller)
+//      * executing a sig() update means adding caller to the observers of sig
+//      * when sig's value changes, all previously observing signals are re-evaluated
+//         * the set sig.observers is cleared
+//         * the set is cleared because re-evaluation of sig will re-enter the signal caller into the list sig.observers, as long as caller still depends on sig
+
+trait Signal[+T]:
+    def apply(): Signal.Observed[T]
+
+object Signal:
+
+
+    opaque type Observer = AbstractSignal[?]
+    
+
+    abstract class AbstractSignal[+T] extends Signal[T]:
+        private var currentValue: T = _
+        private var observers: Set[Observer] = Set()
+
+        def apply(): Observed[T] = 
+            observers += caller // Add callers to observer set
+            assert(!caller.observers.contains(this), "cyclic signal definition") // Prevents scenarios where you attempt to define s() = s() + 1
+            currentValue // Return current value
+
+        protected def eval: () => Observed[T] // Evaluate the signal
+
+
+// Signal value is evaluated using computeValue()
+//   * on initialization
+//   * when an observed signal changes its value
+        protected def computeValue(): Unit = 
+            val newValue = eval(using this)
+
+            val observeChange = observers.nonEmpty && newValue != currentValue // check there are observers, and the newValue represents a change
+
+            currentValue = newValue // update the currentValue
+            if observeChange then
+                val obs = observers
+                observers = Set() // clear observers. computeValue will re-insert each observer
+                obs.foreach(_.computeValue()) // computeValue for each observer
+
+
+    def apply[T](expr: => Observed[T]): Signal[T] = 
+        new AbstractSignal[T]:
+            val eval = () => expr
+            computeValue()
+
+    class Var[T](initExpr: => Observed[T]) extends AbstractSignal[T]:
+        protected var eval = () => initExpr
+        computeValue()
+
+        def update(newExpr: => Observed[T]): Unit = 
+            eval = () => newExpr
+            computeValue()
+
+    // Need way to determine the relevant callers. Could pass the caller to every expression that is evaluated
+    // Can do this by passing them implicitly
+    type Observed[T] = Observer ?=> T
+
+    def caller(using o: Observer) = o
+
+    given noObserver as Observer = new AbstractSignal[Nothing]: // For case where there are no signals that are callers, pass this implicitly
+        override def eval = ???
+        override def computeValue() = ()
