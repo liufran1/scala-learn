@@ -88,3 +88,84 @@ def getUniqueId(): Long = x.synchronized {
     uidCount
 }
 
+// Deadlocking
+class Account(private var amount: Int = 0){
+    def transfer(target: Account, n: Int) =
+        this.synchronized {
+            target.synchronized { // Nest the synchronization blocks
+                this.amount -= n  // Ensure atomicity on both the initiating and target account
+                target.amount += n
+            }
+        }
+}
+
+def startThread(a: Account, b: Account, n: Int) = {
+    val t = new Thread {
+        override def run() {
+            for (i <-0 until n) {
+                a.transfer(b, 1)
+            }
+        }
+    }
+    t.start()
+    t
+}
+
+val a1 = new Account(500000)
+val a2 = new Account(700000)
+
+val t = startThread(a1, a2, 150000)
+val s = startThread(a2, a1, 150000)
+t.join()
+s.join()
+
+// This never terminates
+//   t and s are both competing for ownership of the monitors on the a1 and a2 accounts, 
+//     because we set up a synchronization block around the account transfers
+//   t and s are waiting for each other to finish without releasing the already acquired resources
+//     t has grabbed the monitor block around a2, s has grabbed a1. t is waiting for s to finish with a1 to grab it, and vice-versa
+
+// Ways to resolve deadlocks -
+//   Always acquire resources in the same order, so it's not cyclic
+
+val uid = getUniqueUid()
+
+private def lockAndTransfer(target: Account, n: Int) = 
+    this.synchronized {
+        target.synchronized {
+            this.amount -= n
+            target.amount += n
+        }
+    }
+def transfer(target: Account, n: Int) = 
+    if (this.uid < target.uid) this.lockAndTransfer(target, n) // Ensures transfers always happen ordered by account uid
+    else target.lockAndTransfer(this, -n)
+
+//   Memory model - set of rules on how threads interact when accessing shared memory
+//     * Two threads writing to separate location in memory do not need synchronization
+//     * a thread X that calls join on thread Y is guaranteed to observe all the writes by thread Y after join returns
+
+
+
+// Calculating p-norm in parallel
+def sumSegment(a: Array[Int], p: Int, s: Int, t: Int): Int = { // Sequential sum
+    var i = s
+    var sum: Int = 0
+    while (i < t) {
+        sum = sum + power(a(i), p)
+        i = i + 1
+    }
+    sum
+}
+
+def pNormRec(a: Array[Int], p: Int): Double = 
+    power(segmentRec(a, p, 0, a.length), 1/p)
+
+def segmentRec(a: Array[Int], p: Int, s: Int, t: Int) = {
+    if (t - s < threshold) then sumSegment
+    else {
+        val m = s + (t - s)/2 // Split indices in two to recursively break into parallel computations
+        val (sum1, sum2) = parallel(segmentRec(a, p, s, m), segmentRec(a, p, m, t)) // The parallel call indicates these should be run in parallel
+        sum1 + sum2
+    }
+}// parallel - a function that takes parameters by name
