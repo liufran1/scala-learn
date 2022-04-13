@@ -169,3 +169,25 @@ def segmentRec(a: Array[Int], p: Int, s: Int, t: Int) = {
         sum1 + sum2
     }
 }// parallel - a function that takes parameters by name
+
+
+// task - alternative construct
+val (v1, v2) = parallel(e1, e2) 
+// Can alternatively be written as
+val t1 = task(e1) // starts e1 in the background
+val t2 = task(e2)
+val v1 = t1.join // blocks and waits until e1 has completed
+val v2 = t2.join
+
+def task(c: => A): Task[A] // takes c by name
+
+trait Task[A] {
+    def join: A
+}
+
+// Can define parallel in terms of task
+def parallel[A, B](cA: => A, cB: => B): (A, B) = {
+    val tB: Task[B] = task { cB } // kicks B into a task while A is computed directly
+    val tA: A = cA
+    (tA, tB.join)
+}
