@@ -188,6 +188,63 @@ trait Task[A] {
 // Can define parallel in terms of task
 def parallel[A, B](cA: => A, cB: => B): (A, B) = {
     val tB: Task[B] = task { cB } // kicks B into a task while A is computed directly
-    val tA: A = cA
+    val tA: A = cA // no need to put A into a task because we're not computing anything else
     (tA, tB.join)
+}
+
+
+// Asymptotic complexity analysis
+//   Work W(e): number of steps e would take if there were no parallelism. sequential execution time
+//     W(parallel(e1, e2)) = W(e1) + W(e2) + c2 (constant cost)
+//   Depth D(e): number of steps e would take with unbounded parallelism - max of parallel running times
+//     D(parallel(e1, e2)) = max(D(e1), D(e2)) + c1
+
+//  given P parallel threads, an estimate of running time is
+//  D(e) + W(e)/P
+//    W(e)/P - need to do every piece of work, can only reduce this by spreading across the P threads
+//    D(e) - have dependencies at every depth
+
+
+// Amdahl's law - given
+//   p: proportion of the program that benefits from speedups
+//   s: improvement in speed
+//  then overall speedup = 1/(1-p+p/s)
+// so if 30% of a program benefits from a 2x speedup, the overall speedup is 1/(1-0.3+0.3/2) = 1.18
+
+// Benchmarking programs
+//   measurement is difficult because the performance metric is usually a random variable
+//   need to measure in steady state, so often need to perform a warm-up
+
+//   ScalaMeter - existing library
+import org.scalameter._
+
+val time = measure {
+    (0 until 100000).toArray
+} // Returns time in milliseconds
+
+// JVM Warmup consists of the following steps
+//   1. Program is interpreted
+//   2. Program is compiled
+//   3. JVM applies dynamic optimizations
+//   4. Program reaches steady state
+
+//  ScalaMeter - Warmer objects run the benchmarked code until detecting steady state
+
+val time = withWarmer(new Warmer.Default) measure {
+    (0 until 100000).toArray
+}
+
+// Can also specify parameters over the default
+val time = config(
+    Key.exec.minWarmupRuns -> 20,
+    Key.exec.maxWarmupRuns -> 60,
+    Key.verbose -> true,
+
+) withWarmer(new Warmer.Default) measure {
+    (0 until 100000).toArray
+}
+
+// Can also measure other metrics such as memory footprint and garbage collection cycles
+withMeasurer(new Measurer.MemoryFootprint) measure {
+    (0 until 100000).toArray
 }
