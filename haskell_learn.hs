@@ -169,3 +169,59 @@ divideByTen = (/10)
 
 isUpperAlphanum :: Char -> Bool
 isUpperAlphanum = (`elem` ['A'..'Z'])
+
+
+applyTwice :: (a -> a) -> a -> a  -- takes two inputs: a function that takes (a -> a), another input of type a, and outputs type a
+applyTwice f x = f (f x) -- applyTwice applies the input function twice
+
+applyTwice (+3) 10 
+-- 16 -- adds 3 to 10 twice
+
+
+zipWith' :: (a -> b -> c) -> [a] -> [b] -> [c]  -- takes two lists [a] and [b] and applies f(a,b)->c to them
+zipWith' _ [] _ = []  
+zipWith' _ _ [] = []  
+zipWith' f (x:xs) (y:ys) = f x y : zipWith' f xs ys  
+
+zipWith' (++) ["foo ", "bar ", "baz "] ["fighters", "hoppers", "aldrin"]  
+-- ["foo fighters","bar hoppers","baz aldrin"]  
+-- Useful to use higher order functions on functions
+-- One example is implementing 'map'
+
+map :: (a -> b) -> [a] -> [b]  
+map _ [] = []  
+map f (x:xs) = f x : map f xs  
+
+-- Or 'filter'
+filter :: (a -> Bool) -> [a] -> [a]  
+filter _ [] = []  
+filter p (x:xs)   
+    | p x       = x : filter p xs  
+    | otherwise = filter p xs  
+
+-- can use map and filter with lazy evaluation
+-- find the largest number under 100,000 that's divisible by 3829
+largestDivisible :: (Integral a) => a  
+largestDivisible = head (filter p [100000,99999..])  -- lazy evaluation means the list doesn't have to be finite
+    where p x = x `mod` 3829 == 0  
+
+-- Or count number of collatz chains longer than a certain length
+chain :: (Integral a) => a -> [a]  -- Construct the Collatz chain as a list
+chain 1 = [1]  
+chain n  
+    | even n =  n:chain (n `div` 2)  
+    | odd n  =  n:chain (n*3 + 1)  
+
+numLongChains :: Int  
+numLongChains = length (filter isLong (map chain [1..100]))  -- return number of chains longer than 15
+    where isLong xs = length xs > 15  
+
+
+-- instead of defining isLong, can use an annonymous function. a lambda
+-- \xs -> length xs > 15
+numLongChains = length (filter (\xs -> length xs > 15) (map chain [1..100]))  
+
+
+-- left and right fold:
+sum' :: (Num a) => [a] -> a  
+sum' xs = foldl (\acc x -> acc + x) 0 xs  
