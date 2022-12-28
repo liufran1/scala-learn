@@ -225,3 +225,110 @@ numLongChains = length (filter (\xs -> length xs > 15) (map chain [1..100]))
 -- left and right fold:
 sum' :: (Num a) => [a] -> a  
 sum' xs = foldl (\acc x -> acc + x) 0 xs  
+
+
+
+-- function composition syntax
+-- instead of 
+map (\x -> negate (abs x)) [5,-3,-6,7,-3,2,-19,24] 
+
+-- use '.' syntax
+map (negate . abs) [5,-3,-6,7,-3,2,-19,24]
+
+-- can use this syntax to express functions as 'point free,' removing extraneous variable invocations
+fn x = ceiling (negate (tan (cos (max 50 x))))  
+-- can get rid of the x, converts to
+fn = ceiling . negate . tan . cos . max 50  
+
+-- need the function composition notation. can't just remove x, otherwise could be ambiguous
+-- for example, the x could have been part of cos instead of max
+-- fn x = ceiling (negate (tan (cos (max 50 ) x)))  
+-- function composition notation makes clear how the functions are applied
+
+-- Module Imports
+import Data.List
+
+-- Can resolve name clashes with qualified imports
+import qualified Data.Map as M 
+-- M.filter --this calls the 'filter' function from Data.Map instead of the default one in the namespace
+
+-- some modules - http://learnyouahaskell.com/modules
+
+
+-- Creating data types
+-- can create them using the data keyword
+data Bool = False | True  
+-- 'False' and 'True' are the different values the Bool datatype could possibly take
+-- add more possible values with additional 'or':| operators
+
+data Shape = Circle Float Float Float | Rectangle Float Float Float Float   
+-- a 'Shape' data type can be either a 'Circle', which takes 3 float constructor values (center (x,y) and radius)
+-- or a 'Rectangle', which takes 4 float constructor values upper left (x,y) and bottom right (x,y)
+
+
+-- Creating a function taking a Shape as an input
+surface :: Shape -> Float  
+surface (Circle _ _ r) = pi * r ^ 2  
+surface (Rectangle x1 y1 x2 y2) = (abs $ x2 - x1) * (abs $ y2 - y1)  
+-- pattern match against the two different possible data values
+
+-- can use 'deriving' to add the datatype to a typeclass
+data Shape = Circle Float Float Float | Rectangle Float Float Float Float deriving (Show)  
+-- by adding to the Show typeclass, 'deriving (Show)', calling 'print' on Shapes works
+
+-- constructors are functions
+map (Circle 10 20) [4,5,6,6]
+-- this creates four circles centered at (10, 20) with the four radii
+
+-- Can create an intermediate data type to describe a cartesian point
+data Point = Point Float Float deriving (Show)  
+
+-- We then update 'Shape'
+data Shape = Circle Point Float | Rectangle Point Point deriving (Show)  
+
+
+-- Can use record syntax to name the field types
+data Car = Car {company :: String, 
+                model :: String, 
+                year :: Int} deriving (Show)  
+
+
+-- functions are automatically created for each of these fields
+-- can instantiate a data type that has record syntax like this
+let myCar = Car {company="Ford", model="Mustang", year=1967}  -- and don't need to write them in the order they were defined
+
+
+-- can create type constructors that take types as inputs
+data Vector a = Vector a a a deriving (Show)   
+
+
+-- Can define types as synonyms of each other
+type String = [Char]  -- a string is the same thing as a list of chars, and behaves the same
+
+
+-- Can make recursive data structures, where the constructor contains the data type
+data List a = Empty | Cons a (List a) deriving (Show, Read, Eq, Ord)  
+-- build up lists by recursively adding heads to the empty list, where 'Cons'==':'
+
+
+-- functor typeclass: for things that can be mapped over
+class Functor f where  
+    fmap :: (a -> b) -> f a -> f b 
+
+
+
+-- Input-output
+-- main = do syntax
+main = do  
+    putStrLn "Hello, what's your name?"  
+    name <- getLine  -- IO string getLine. <- used for assignment, instead of = which is definition
+    putStrLn ("Hey " ++ name ++ ", you rock!")  
+
+-- in general, Exceptions are IO actions because they print an error to stdout
+-- should avoid IO in functions to keep them pure
+-- Errors should mostly be handled using the strict type checking in Haskell
+
+
+
+
+
